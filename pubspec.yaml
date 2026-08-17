@@ -1,0 +1,25 @@
+name: dga_ui
+description: "DGA (Platforms Code — Community) design system starter for Flutter: tokens (colors, spacing, radius, typography, shadows) and DgaButton."
+version: 0.0.1
+homepage: https://github.com/duaamahya/dga_ui
+
+# Blocks `dart pub publish` from accidentally pushing this to public pub.dev.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.8.0
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  # Font is NOT bundled in this package — host apps supply
+  # "IBM Plex Sans Arabic" via their own pubspec or google_fonts.
+  # See README for instructions.
