@@ -1,39 +1,111 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# dga_ui
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+A Flutter implementation of the DGA (Saudi Digital Government Authority) **Platforms Code** design system — tokens and components, built to match the Figma source to the pixel and color.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+> Not published to pub.dev (`publish_to: none`). Use it as a local/git dependency within your own projects.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- **Token layer** — primitives, semantic colors (light + dark), spacing, radius, typography, and shadows, all sourced from the design system's token files. `DgaTheme` exposes them to the widget tree; nothing in the component layer hardcodes a color.
+- **30+ components** covering actions, forms, data display, navigation, and feedback — see the table below.
+- **Light and dark mode**, RTL-aware layouts, and accessible semantics (selection state, labels, roles) throughout.
+- **A gallery app** in [`example/`](example) that demos every component live, with light/dark and LTR/RTL toggles.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add it as a path or git dependency in your app's `pubspec.yaml`:
+
+```yaml
+dependencies:
+  dga_ui:
+    path: ../dga_ui   # or a git: entry pointing at this repo
+```
+
+Requires Flutter `>=3.19.0` / Dart `^3.8.0`.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Wrap your app in a `DgaTheme` (typically inside `MaterialApp.builder`, so it's available on every route):
 
 ```dart
-const like = 'sample';
+import 'package:dga_ui/dga_ui.dart';
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      builder: (context, child) => DgaTheme(
+        data: const DgaThemeData.light(), // or .dark()
+        child: child!,
+      ),
+      home: const HomePage(),
+    );
+  }
+}
 ```
+
+Then use components anywhere below it — colors and text styles read from `DgaTheme.of(context)`:
+
+```dart
+DgaButton.primary(
+  label: 'Continue',
+  onPressed: () {},
+)
+
+DgaTabBar(
+  items: const [
+    DgaTabBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+    DgaTabBarItem(
+      icon: Icon(Icons.mail_outline),
+      label: 'Inbox',
+      badge: DgaBadge.count(3),
+    ),
+  ],
+  selectedIndex: selectedIndex,
+  onChanged: (i) => setState(() => selectedIndex = i),
+)
+```
+
+Run the gallery app to see every component, its variants, and states:
+
+```sh
+cd example
+flutter run
+```
+
+## Components
+
+| Category | Components |
+|---|---|
+| Actions | `DgaButton`, `DgaMenuButton`, `DgaCloseButton`, `DgaFloatingButton`, `DgaLink` |
+| Forms & Inputs | `DgaTextInput`, `DgaTextarea`, `DgaDropdownInput`, `DgaSwitch`, `DgaRadio`, `DgaCheckbox`, `DgaRating`, `DgaSlider`, `DgaDatePickerInput`, `DgaCalendar` |
+| Data Display | `DgaChip`, `DgaTag`, `DgaStatusTag`, `DgaAvatar`, `DgaCard`, `DgaQuote`, `DgaBadge` |
+| Navigation | `DgaTabBar`, `DgaHorizontalTab`, `DgaVerticalTab`, `DgaAccordion`, `DgaContentSwitcher`, `DgaCarousel` |
+| Feedback | `DgaTooltip`, `DgaProgressBar`, `DgaCircularProgressBar`, `DgaCircleStepper`, `DgaRadialStepper`, `DgaInlineAlert`, `DgaNotificationToast` |
+
+`DgaNotification` also ships for backward compatibility — new code should use `DgaInlineAlert` / `DgaNotificationToast` instead.
+
+## Conventions
+
+- **`*Button` components** (`DgaButton`, `DgaFloatingButton`, …) expose visual styles as named constructors (`DgaButton.primary(...)`, `.secondaryOutline(...)`) rather than an enum parameter.
+- Other components use enums for style/size axes, e.g. `DgaAlertSeverity`, `DgaTextInputSize`.
+- `disabled` is always an explicit `bool` parameter — it's never inferred from a null callback.
+- Sizing is expressed with `DgaSpacing` / `DgaRadius` tokens wherever the design system defines an equivalent value.
+
+## Testing
+
+```sh
+flutter analyze
+flutter test
+```
+
+Every component ships with widget tests covering its states, both themes, and RTL where relevant.
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+Component specs are sourced from the DGA Platforms Code Figma files. If a color doesn't exist in the token files, it's called out with a `// new:` comment next to its definition rather than silently introduced.
